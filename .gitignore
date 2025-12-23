@@ -1,0 +1,17 @@
+# Ignore the build directory
+build/
+cmake-build-debug/  # CLion's default build folder
+
+# Ignore compiled binaries
+*.o
+*.out
+*.exe
+
+# Ignore massive data files
+data/*.pbf
+data/*.osm
+
+# Ignore OS files
+.DS_Store
+
+.idea/
