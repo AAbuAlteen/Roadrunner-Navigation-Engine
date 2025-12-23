@@ -1,17 +1,28 @@
-# Ignore the build directory
+# --- Build & Output ---
 build/
-cmake-build-debug/  # CLion's default build folder
-
-# Ignore compiled binaries
+cmake-build-debug/
+bin/
+lib/
 *.o
 *.out
 *.exe
+*.a
+*.dylib
+*.dll
 
-# Ignore massive data files
+# --- Data (NEVER Commit These) ---
 data/*.pbf
 data/*.osm
+data/*.csv
 
-# Ignore OS files
-.DS_Store
-
+# --- IDE Settings ---
 .idea/
+.vscode/
+*.swp
+*.DS_Store
+
+# --- Generated Files ---
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
