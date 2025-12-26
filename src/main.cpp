@@ -3,7 +3,9 @@
 #include <osmium/visitor.hpp>
 #include "osm_handler.h"
 #include "graph.h"
-#include "router.h"
+#include "dijkstra_router.h"
+#include "a_star_router.h"
+#include "bidirectional_router.h"
 
 int main() {
     // 1. Setup File Path
@@ -44,36 +46,65 @@ int main() {
     std::cout << "Edges: " << edge_count << std::endl;
     std::cout << "---------------------------------" << std::endl;
 
-    std::cout << "Initializing Router..." << std::endl;
-    Router router(my_graph);
-
-    // Pick two random nodes
-    // Note: In a disconnected graph, these might not have a path.
-    // If you get -1, try changing these numbers.
+// --- Define Nodes Once ---
     int start_node = 0;
-    int end_node = 100;
-
-    // Make sure they are within bounds
+    int end_node = 1000;
     if (end_node >= my_graph.nodes.size()) end_node = my_graph.nodes.size() - 1;
 
-    std::cout << "Finding path from Node " << start_node << " to " << end_node << "..." << std::endl;
+    std::cout << "\n=== BENCHMARK ROUND (Node " << start_node << " -> " << end_node << ") ===" << std::endl;
 
-    // Measure time
-    auto start_time = std::chrono::high_resolution_clock::now();
+    // ---------------------------------------------------------
+    // 1. Standard Dijkstra
+    // ---------------------------------------------------------
+    {
+        std::cout << "Running Standard Dijkstra..." << std::endl;
+        auto start_time = std::chrono::high_resolution_clock::now();
 
-    std::vector<int> path;
-    double distance = router.find_path(start_node, end_node, path);
+        DijkstraRouter router(my_graph); // Ensure class is named DijkstraRouter in header
+        std::vector<int> path;
+        double distance = router.find_path(start_node, end_node, path);
 
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
-    if (distance < 0) {
-        std::cout << "No path found (Nodes might be in different islands)." << std::endl;
-    } else {
-        std::cout << "Path Found!" << std::endl;
-        std::cout << "Distance: " << distance / 1000.0 << " km" << std::endl;
-        std::cout << "Path Length: " << path.size() << " nodes" << std::endl;
-        std::cout << "Calculation Time: " << duration << " ms" << std::endl;
+        std::cout << "  -> Distance: " << distance / 1000.0 << " km" << std::endl;
+        std::cout << "  -> Time: " << duration << " ms" << std::endl;
+    }
+
+    // ---------------------------------------------------------
+    // 2. A* Search
+    // ---------------------------------------------------------
+    {
+        std::cout << "Running A* Search..." << std::endl;
+        auto start_time = std::chrono::high_resolution_clock::now();
+
+        AStarRouter router(my_graph); // Ensure class is named AStarRouter in header
+        std::vector<int> path;
+        double distance = router.find_path(start_node, end_node, path);
+
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+        std::cout << "  -> Distance: " << distance / 1000.0 << " km" << std::endl;
+        std::cout << "  -> Time: " << duration << " ms" << std::endl;
+    }
+
+    // ---------------------------------------------------------
+    // 3. Bidirectional Dijkstra
+    // ---------------------------------------------------------
+    {
+        std::cout << "Running Bidirectional Dijkstra..." << std::endl;
+        auto start_time = std::chrono::high_resolution_clock::now();
+
+        BidirectionalRouter router(my_graph);
+        std::vector<int> path;
+        double distance = router.find_path(start_node, end_node, path);
+
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+        std::cout << "  -> Distance: " << distance / 1000.0 << " km" << std::endl;
+        std::cout << "  -> Time: " << duration << " ms" << std::endl;
     }
 
     return 0;

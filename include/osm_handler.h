@@ -24,7 +24,6 @@ class GraphBuilder : public osmium::handler::Handler {
 public:
     explicit GraphBuilder(Graph& g) : graph(g) {}
 
-    // Helper: "I have OSM Node 59201. Give me Internal Node 5."
     int get_or_create_node(int64_t osm_id, const osmium::Location& loc) {
         if (id_map.find(osm_id) == id_map.end()) {
             // New Node found!
@@ -35,9 +34,12 @@ public:
 
             internal_id_counter++;
 
-            // Dynamic resizing for the Adjacency List
+            // Dynamic resizing for BOTH Adjacency Lists
             if (graph.adj_list.size() <= internal_id_counter) {
-                graph.adj_list.resize(internal_id_counter + 10000); // Grow in chunks
+                size_t new_size = internal_id_counter + 10000; // Grow in chunks
+
+                graph.adj_list.resize(new_size);
+                graph.reverse_adj_list.resize(new_size); // <--- ADD THIS LINE
             }
         }
         return id_map[osm_id];
@@ -72,8 +74,11 @@ public:
                 double dist = haversine_distance(n1.location().lat(), n1.location().lon(),
                                                n2.location().lat(), n2.location().lon());
 
-                // 3. Add Edge (Bidirectional for now)
+                // 3. Add Edges (Explicitly Bidirectional)
+                // Forward: u -> v
                 graph.add_edge(u, v, dist);
+                // Backward: v -> u
+                graph.add_edge(v, u, dist);
             }
         }
     }

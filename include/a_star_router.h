@@ -9,11 +9,11 @@
 // {F-Score (g + h), NodeID}
 using PQElement = std::pair<double, int>;
 
-class Router {
+class AStarRouter {
     const Graph& graph;
 
 public:
-    Router(const Graph& g) : graph(g) {}
+    AStarRouter(const Graph& g) : graph(g) {}
 
     // A* Search
     double find_path(int start, int end, std::vector<int>& path) {

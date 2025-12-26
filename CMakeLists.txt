@@ -17,5 +17,7 @@ include_directories(libs/protozero/include)
 add_executable(Roadrunner src/main.cpp
         include/utils.h
         include/graph.h
-        include/router.h)
+        include/a_star_router.h
+        include/bidirectional_router.h
+        include/dijkstra_router.h)
 target_link_libraries(Roadrunner Threads::Threads ZLIB::ZLIB)
